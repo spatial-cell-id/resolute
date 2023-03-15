@@ -21,7 +21,7 @@ To use the function, simply copy it from score_function.py and use in your own s
 #### Parameters:
 * original_adata: the AnnData file containing the normalized and scaled data and dimensionality reductions (_PCA_ and _UMAP_ or _tsne_)
 * clustering_algorithm: the algorithm to use to test the different clustering (string). Possible choices: **leiden**,**louvain**. Default: **'leiden'**.
-* dim_reduction: coordinates to use for calculating the BIC score (string). Possible choices: **pca**, **umap** and **tsne**. Default: **'pca'**.
+* dim_reduction: coordinates to use for calculating the BIC score (string). Possible choices: **pca**, **umap**. Default: **'pca'**.
 * min_res: minimum resolution to test (float). Default: **0.1**.
 * max_res: maximum resolution to test (float). Default: **2.0**.
 * step: step size for resolutions to be tested between _min_res_ and _max_res_ (float). Default: **0.1**

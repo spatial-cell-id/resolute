@@ -7,6 +7,40 @@ It has been inspired by this [read](https://towardsdatascience.com/are-you-still
 
 Here, the minimum of the BIC or Calinski-Harabasz score indicates the optimum resolution parameter.
 
+### BIC score
+The BIC (Bayesian Information Criterion) score is a statistical measure used  to assess the goodness of fit of a statistical model. It is often used in the context of model selection among a set of candidate models.
+
+The BIC score derives from Bayesian probability theory and is based on the likelihood function of the data given a particular model. It balances the trade-off between model complexity (the number of parameters in the model) and the goodness of fit to the data. The goal is to find a model that fits the data well while penalizing overly complex models that may overfit the data.
+
+In the function, the BIC score was manually implemented by using the formula:
+```math
+BIC = -2*log(L) + k*log(N)
+```
+Where:
+- L is the likelihood of the data given the model;
+- k is the number of parameters in the model;
+- N is the number of data points.
+
+Further details on BIC score can be found [here](https://www-sciencedirect-com.insb.bib.cnrs.fr/topics/mathematics/bayesian-information-criterion).
+
+### Calinski-Harabasz score
+The Calinski-Harabasz (CH) score is a metric used for evaluating the quality of clusters in unsupervised machine learning, particularly in clustering analysis. It aims to determine the optimal number of clusters. The CH score is based on the ratio of the between-cluster variance to the within-cluster variance. It measures the compactness of clusters (small within-cluster variance) relative to their separation (large between-cluster variance). A higher CH score indicates better-defined and well-separated clusters.
+
+The formula for calculating the Calinski-Harabasz score is as follows:
+```math
+CH = (B / (k - 1)) / (W / (n - k))
+```
+
+Where:
+- CH is the Calinski-Harabasz score;
+- B is the between-cluster variance, which measures the variance between cluster centroids;
+- k is the number of clusters;
+- W is the within-cluster variance, which measures the variance within each cluster;
+- n is the total number of data points.
+
+In the function, the Calinski-Harabasz score was calculated by using the function _calinski_harabasz_score()_ from _sklearn_ library, which takes as an input PCA or UMAP coordinates of each cell and a vector with the claster label of each cell.
+For the purpose of plotting, -1*CH is defined to be the output, so then the lowest score indicates better-defined and well-separated clusters, as it happens with BIC score.
+
 ### Nedeed libraries
 numpy, scanpy, sklearn
 

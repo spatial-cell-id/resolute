@@ -2,6 +2,7 @@ def clustering_score(original_adata, score_value = 'bic', clustering_algorithm='
     #calinski_harabasz
     import numpy as nu
     import scanpy as sc
+    import pandas as pd
     from sklearn.metrics import calinski_harabasz_score
 
     sc.settings.verbosity = 0

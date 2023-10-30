@@ -3,8 +3,6 @@
 
 This function aims to find the optimum resolution parameter for clustering single-cell RNA-Seq data analyzed with _scanpy_, by calculating the BIC score or the Calinski-Harabasz score of each clustering.
 
-It has been inspired by this [read](https://towardsdatascience.com/are-you-still-using-the-elbow-method-5d271b3063bd) and then adapted to the single-cell analysis in scanpy.
-
 Here, the minimum of the BIC or Calinski-Harabasz score indicates the optimum resolution parameter.
 
 ### BIC score

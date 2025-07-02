@@ -1,9 +1,8 @@
-# Optimum resolution
+# BaCHClue: Bic and Calinski-Harabasz Score Guided Clustering
 
+BaCHClue aims to find the optimal resolution parameter for clustering single-cell RNA-Seq data analyzed with _scanpy_, by calculating the BIC score or the Calinski-Harabasz score of each clustering, given a range of possible resolutions.
 
-This function aims to find the optimum resolution parameter for clustering single-cell RNA-Seq data analyzed with _scanpy_, by calculating the BIC score or the Calinski-Harabasz score of each clustering.
-
-Here, the minimum of the BIC or Calinski-Harabasz score indicates the optimum resolution parameter.
+Here, the minimum of the BIC or Calinski-Harabasz score indicates the optimal resolution parameter.
 
 ### BIC score
 The BIC (Bayesian Information Criterion) score is a statistical measure used  to assess the goodness of fit of a statistical model. It is often used in the context of model selection among a set of candidate models.
@@ -44,6 +43,8 @@ numpy, scanpy, sklearn
 
 
 ### Usage
+
+
 ```python
 clustering_score(original_adata, score_value = 'bic', clustering_algorithm='leiden', dim_reduction = 'pca', min_res=0.1, max_res=2.0, step=0.1, plot=True)
 ```

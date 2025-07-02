@@ -1,0 +1,23 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "BaCHClue"
+version = "1.0.1"
+authors = [
+  { name="Marco Uderzo", email="marco.uderzo@ens-lyon.fr" },
+  { name="Sergio Sarnataro", email="sergio.sarnataro@ens-lyon.fr" }
+]
+description = "BaCHClue helps to find the optimal resolution parameter for clustering scRNA-seq data analyzed with Scanpy, by calculating the BIC score or the Calinski-Harabasz score of each clustering given an interval of possible resolutions."
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = { text = "GPL-3.0-or-later" }
+license-files = ["LICENSE"]
+
+[project.urls]
+Homepage = "https://gitbio.ens-lyon.fr/spatial-cell-id/bachclue"

@@ -1,1 +1,2 @@
-from .bachclue import clustering_score
+from .bachclue import *
+from . import multiplex

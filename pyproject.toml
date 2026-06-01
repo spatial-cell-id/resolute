@@ -3,13 +3,13 @@ requires = ["hatchling >= 1.26"]
 build-backend = "hatchling.build"
 
 [project]
-name = "BaCHClue"
-version = "1.0.1"
+name = "RESOLUTE"
+version = "1.0.0"
 authors = [
   { name="Marco Uderzo", email="marco.uderzo@ens-lyon.fr" },
   { name="Sergio Sarnataro", email="sergio.sarnataro@ens-lyon.fr" }
 ]
-description = "BaCHClue helps to find the optimal resolution parameter for clustering scRNA-seq data analyzed with Scanpy, by calculating the BIC score or the Calinski-Harabasz score of each clustering given an interval of possible resolutions."
+description = "RESOLUTE is a Python package designed for selecting the optimal clustering resolution in Scanpy-based single-cell and spatial transcriptomics analyses, leveraging geometric metrics and topological stability evaluation."
 readme = "README.md"
 requires-python = ">=3.9"
 classifiers = [
@@ -20,4 +20,4 @@ license = { text = "GPL-3.0-or-later" }
 license-files = ["LICENSE"]
 
 [project.urls]
-Homepage = "https://gitbio.ens-lyon.fr/spatial-cell-id/bachclue"
+Homepage = "https://gitbio.ens-lyon.fr/spatial-cell-id/resolute"

@@ -346,7 +346,7 @@ def run_parallel_stability(adata, min_res=0.1, max_res=2.0, step=0.2, use_rep=No
     return df_results, best_res
 
 
-def plot_bachclue(df_score, best_res_score, score_metric, df_stab=None, best_res_stab=None):
+def plot_resolute(df_score, best_res_score, score_metric, df_stab=None, best_res_stab=None):
     num_plots = 2 if df_stab is not None else 1
     fig, axes = plt.subplots(1, num_plots, figsize=(8 * num_plots, 5))
     if num_plots == 1:
@@ -383,7 +383,7 @@ def plot_bachclue(df_score, best_res_score, score_metric, df_stab=None, best_res
     plt.show()
 
     
-def run_bachclue(adata, 
+def run_resolute(adata, 
                  score_value='bic', 
                  clustering_algorithm='leiden',
                  use_rep='X_pca',
@@ -396,7 +396,7 @@ def run_bachclue(adata,
                  n_iterations=50,
                  n_jobs=-1,
                  plot=True):
-    """Main execution wrapper for BaCHClue clustering optimization."""
+    """Main execution wrapper for RESOLUTE clustering optimization."""
 
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
     os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
@@ -431,7 +431,7 @@ def run_bachclue(adata,
         )
 
     if plot:
-        plot_bachclue(df_score, best_res_score, score_value, df_stab, best_res_stab)
+        plot_resolute(df_score, best_res_score, score_value, df_stab, best_res_stab)
         
     if df_stab is not None:
         df_merged = pd.merge(df_score, df_stab, on='resolution', suffixes=('_clust_score', '_stab'))

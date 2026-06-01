@@ -1,11 +1,11 @@
-# BaCHClue: Bic and Calinski-Harabasz Score Guided Clustering
+# RESOLUTE: Robust Evaluation of Single-cell Optimal Leiden resolUtion on Topological Embeddings
 
-BaCHClue is a Python suite designed for selecting the optimal clustering resolution in Scanpy-based single-cell and spatial transcriptomics analyses.
+RESOLUTE is a Python package designed for selecting the optimal clustering resolution in Scanpy-based single-cell and spatial transcriptomics analyses.
 
-In high-dimensional transcriptomic data, clustering algorithms (like Leiden or Louvain) rely heavily on a user-defined resolution parameter, which dictates the granularity of the resulting cell populations. Traditionally, selecting this resolution involves manual, subjective trial-and-error. BaCHClue eliminates this ambiguity by evaluating multiple clustering resolutions across a defined range and computing statistical validation metrics. This allows researchers to identify biologically meaningful cluster structures based on quantitative, reproducible criteria.
+In high-dimensional transcriptomic data, clustering algorithms (like Leiden or Louvain) rely heavily on a user-defined resolution parameter, which dictates the granularity of the resulting cell populations. Traditionally, selecting this resolution involves manual, subjective trial-and-error. RESOLUTE eliminates this ambiguity by evaluating multiple clustering resolutions across a defined range and computing statistical validation metrics. This allows researchers to identify biologically meaningful cluster structures based on quantitative, reproducible criteria.
 
 ## Core Metrics & Theoretical Foundation
-BaCHClue optimizes the resolution parameter by seeking the mathematical minimum of specific scoring functions. It currently supports two primary geometric metrics, alongside a topological stability evaluation.
+RESOLUTE optimizes the resolution parameter by seeking the mathematical minimum of specific scoring functions. It currently supports two primary geometric metrics, alongside a topological stability evaluation.
 
 ### BIC score
 The BIC (Bayesian Information Criterion) score is a statistical measure used  to assess the goodness of fit of a statistical model. It is often used in the context of model selection among a set of candidate models.
@@ -40,13 +40,13 @@ Where:
 - W is the within-cluster variance, which measures the variance within each cluster;
 - n is the total number of data points.
 
-By default, a higher standard CH score indicates better-defined and well-separated clusters. However, to maintain programmatic consistency with the BIC optimization (where the goal is minimization), BaCHClue calculates the CH score using sklearn and inherently outputs $-1 \times CH$.
+By default, a higher standard CH score indicates better-defined and well-separated clusters. However, to maintain programmatic consistency with the BIC optimization (where the goal is minimization), RESOLUTE calculates the CH score using sklearn and inherently outputs $-1 \times CH$.
 
 Interpretation: Just like the BIC score, the algorithm identifies the optimal resolution by finding the deepest dip (minimum) in the transformed Calinski-Harabasz curve.
 
 
 ### Bootstrap Stability Analysis
-In addition to geometric metrics, BaCHClue can perform iterative subsetting (bootstrapping) to evaluate the topological stability of the clusters at each resolution. By recalculating the neighborhood graph on subsets of the data, this feature ensures the chosen resolution is robust against data perturbation and not an artifact of the specific embedding.
+In addition to geometric metrics, RESOLUTE can perform iterative subsetting (bootstrapping) to evaluate the topological stability of the clusters at each resolution. By recalculating the neighborhood graph on subsets of the data, this feature ensures the chosen resolution is robust against data perturbation and not an artifact of the specific embedding.
 
 
 ### Dependencies
@@ -58,16 +58,16 @@ numpy, scanpy, sklearn, joblib
 Install by pip:
 
 ```bash
-pip install bachclue 
+pip install resolute 
 ```
 
-BaCHClue integrates smoothly into standard Scanpy workflows. It is highly recommended to run your standard preprocessing pipeline (PCA, neighbor graph computation, UMAP) before executing the tool.
+RESOLUTE integrates smoothly into standard Scanpy workflows. It is highly recommended to run your standard preprocessing pipeline (PCA, neighbor graph computation, UMAP) before executing the tool.
 
 #### Example Workflow
 
 ```python
 import scanpy as sc
-import bachclue as bc
+import resolute as rs
 
 # Load and preprocess your data
 adata = sc.read_h5ad('adata.h5ad')
@@ -78,8 +78,8 @@ sc.pp.pca(adata)
 sc.pp.neighbors(adata, use_rep='X_pca')
 sc.tl.umap(adata)
 
-# Run BaCHClue Optimization
-results = bc.run_bachclue(
+# Run RESOLUTE Optimization
+results = bc.run_resolute(
     adata=adata, 
     score_value='calinski', 
     use_rep='X_umap',           # Embedding for evaluating cluster geometry
@@ -138,7 +138,7 @@ A dictionary containing:
 
 
 
-Note that BaCHClue does not add any clustering metadata into the original AnnData file.
+Note that RESOLUTE does not add any clustering metadata into the original AnnData file.
 
 ### Example (Deprecated - to rewrite):
 The notebook _tests/score_function_3kPBMC.ipynb_ contains and example usage of the function. Data consist of 3k PBMCs from a Healthy Donor and are freely available from 10x Genomics, and can be download as follows from a terminal:

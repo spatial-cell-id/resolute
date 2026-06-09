@@ -36,25 +36,11 @@ Clustering is a fundamental step in single-cell RNA sequencing (scRNA-seq) and s
 
 # Statement of need
 
-`Gala` is an Astropy-affiliated Python package for galactic dynamics. Python
-enables wrapping low-level languages (e.g., C) for speed without losing
-flexibility or ease-of-use in the user-interface. The API for `Gala` was
-designed to provide a class-based and user-friendly interface to fast (C or
-Cython-optimized) implementations of common operations such as gravitational
-potential and force evaluation, orbit integration, dynamical transformations,
-and chaos indicators for nonlinear dynamics. `Gala` also relies heavily on and
-interfaces well with the implementations of physical units and astronomical
-coordinate systems in the `Astropy` package [@astropy] (`astropy.units` and
-`astropy.coordinates`).
+Clustering is a critical step in single-cell RNA sequencing and spatial transcriptomics data analysis. While clustering is theoretically an unsupervised process intended to be only data-driven, the selection of the resolution parameter often introduces a strong subjective human component. This parameter dictates the trade-off between over-clustering, which can lead to the identification of artificial sub-populations, and under-clustering, where biologically distinct cell types are merged.
 
-`Gala` was designed to be used by both astronomical researchers and by
-students in courses on gravitational dynamics or astronomy. It has already been
-used in a number of scientific publications [@Pearson:2017] and has also been
-used in graduate courses on Galactic dynamics to, e.g., provide interactive
-visualizations of textbook material [@Binney:2008]. The combination of speed,
-design, and support for Astropy functionality in `Gala` will enable exciting
-scientific explorations of forthcoming data releases from the *Gaia* mission
-[@gaia] by students and experts alike.
+In practice, researchers often perform resolution selection by manually adjusting parameters to match prior biological knowledge or by relying on default settings provided by standard clustering tools. In both scenarios, the resulting clustering output is potentially biased and lacks statistical rigor.
+
+RESOLUTE addresses this challenge by providing an objective framework for resolution selection. It systematically evaluates potential clustering resolutions post-hoc using robust statistical metrics, specifically the Bayesian Information Criterion (BIC) and the Calinski-Harabasz score. Furthermore, RESOLUTE assesses clustering stability through a bootstrapping procedure, offering bioinformaticians a mathematically and statistically grounded starting point for their downstream analyses. By doing that, RESOLUTE minimizes subjective bias, and potentially enhances the reproducibility of single-cell data analysis workflows.
 
 # State of the field                                                                                                                  
 

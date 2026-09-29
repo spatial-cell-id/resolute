@@ -3,7 +3,7 @@ requires = ["hatchling >= 1.26"]
 build-backend = "hatchling.build"
 
 [project]
-name = "RESOLUTE"
+name = "sc_resolute"
 version = "1.0.0"
 authors = [
   { name="Marco Uderzo", email="marco.uderzo@ens-lyon.fr" },
@@ -20,4 +20,4 @@ license = { text = "GPL-3.0-or-later" }
 license-files = ["LICENSE"]
 
 [project.urls]
-Homepage = "https://gitbio.ens-lyon.fr/spatial-cell-id/resolute"
+Homepage = "https://github.com/spatial-cell-id/resolute"

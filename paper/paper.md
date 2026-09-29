@@ -42,79 +42,45 @@ In practice, researchers often perform resolution selection by manually adjustin
 
 RESOLUTE addresses this challenge by providing an objective framework for resolution selection. It systematically evaluates potential clustering resolutions post-hoc using robust statistical metrics, specifically the Bayesian Information Criterion (BIC) and the Calinski-Harabasz score. Furthermore, RESOLUTE assesses clustering stability through a bootstrapping procedure, offering bioinformaticians a mathematically and statistically grounded starting point for their downstream analyses. By doing that, RESOLUTE minimizes subjective bias, and potentially enhances the reproducibility of single-cell data analysis workflows.
 
-# State of the field                                                                                                                  
+# State of the field  
 
-Several tools exist for galactic dynamics computations:                                                     
-`galpy` [@Bovy:2015] is a Python package with similar goals,
-providing orbit integration and potential classes for galactic dynamics.                                                              
-`NEMO` [@Teuben:1995] is a well-established, comprehensive stellar dynamics                                                           
-toolbox written primarily in C, offering extensive functionality but with a                                                           
-steeper learning curve and less integration with modern Python workflows.                                                             
-Other tools like `GalPot` provide specific Milky Way potential models but lack                                                        
-the broader dynamical analysis capabilities.                                                                                          
-                                                                                                                                        
-`Gala` was built rather than contributing to existing projects for several                                                            
-reasons. First, `Gala` was designed from the ground up to integrate seamlessly                                                        
-with the Astropy ecosystem, using `astropy.units` and `astropy.coordinates`                                                           
-as core dependencies rather than optional features. This tight integration                                                            
-enables natural workflows for astronomers already using Astropy. Second,                                                              
-`Gala`'s object-oriented API with consistent interfaces across subpackages                                                            
-(potentials, integrators, dynamics) provides a more modular and extensible                                                            
-design than alternatives available at the time. Third, `Gala` fills a specific                                                        
-niche between simple demonstration codes and full N-body simulation packages                                                          
-like `Gadget` [@Springel:2005] – it focuses on the common tasks in galactic                                                             
-dynamics research (orbit integration, potential evaluation, coordinate                                                                
-transformations) while maintaining both performance through C implementations                                                         
-and usability through its Python interface.  
+Several tools exist for cluster optimization, such as clustree \cite{clustree} in the R ecosystem. While clustree is excellent for visualizing cluster stability across resolutions, it is primarily an interactive visualization tool and does not provide an automated "optimal choice" recommendation for high-throughput automated pipelines.
+Another prominent state-of-the-art tool is MultiK \cite{liu2021multik} , which utilizes a multi-scale consensus clustering approach to identify stable cluster numbers ($K$). MultiK iteratively subsamples the data matrix and runs clustering algorithm across a list of resolutions. It then evaluates stability using the Proportion of Ambiguous Clustering (PAC) metric and test whether adjacent clusters represent distinct multivariate normal distributions. 
+
+While MultiK successfully uncovers stable hierarchical levels of cell organization, it relies on the construction of dense, pairwise cell-by-cell consensus matrices across multiple subsampling iterations. 
+This introduces a severe memory and computational bottleneck ($O(N^2)$ space complexity), making it virtually prohibitive scaling into hundreds of thousands of cells or high-throughput spatial atlases. To address these scalability constraints, \texttt{RESOLUTE} can identify optimal resolutions in a highly efficient manner, by using structural and variance-based metrics (BIC and Calinski-Harabasz) applied directly to low-dimensional embeddings, bypassing iterative resampling altogether when processing ultra-large datasets. 
+When topological robustness is queried, \texttt{RESOLUTE}'s bootstrap module performs parallelized neighborhood graph reconstruction using \texttt{joblib}, avoiding the prohibitive $N \times N$ memory footprint of classical consensus clustering approaches.
+
+We chose to build RESOLUTE rather than contributing to existing R-based packages because the current standard for single-cell analysis in many research institutions is increasingly centered on the Scanpy (Python) framework. RESOLUTE fills a specific gap by offering an integrated, Python solution that functions natively within the AnnData object structure. Its unique contribution is the automated, quantitative ranking of resolutions based on the consistency of the biological signal, rather than merely relying on visual inspection.
 
 # Software design
 
-`Gala`'s design philosophy is based on three core principles: (1) to provide a
-user-friendly, modular, object-oriented API, (2) to use community tools and
-standards (e.g., Astropy for coordinates and units handling), and (3) to use
-low-level code (C/C++/Cython) for performance while keeping the user interface
-in Python. Within each of the main subpackages in `gala` (`gala.potential`,
-`gala.dynamics`, `gala.integrate`, etc.), we try to maintain a consistent API
-for classes and functions. For example, all potential classes share a common
-base class and implement methods for computing the potential, forces, density,
-and other derived quantities at given positions. This also works for
-compositions of potentials (i.e., multi-component potential models), which
-share the potential base class but also act as a dictionary-like container for
-different potential components. As another example, all integrators implement a
-common interface for numerically integrating orbits. The integrators and core
-potential functions are all implemented in C without support for units, but the
-Python layer handles unit conversions and prepares data to dispatch to the C
-layer appropriately.Within the coordinates subpackage, we extend Astropy's
-coordinate classes to add more specialized coordinate frames and
-transformations that are relevant for Galactic dynamics and Milky Way research.
+_RESOLUTE_ is implemented as an open-source Python package engineered to integrate seamlessly with contemporary single-cell and spatial transcriptomics analysis pipelines. It is built natively on top of the _Scanpy_ framework \cite{wolf2018scanpy} and interfaces directly with core scientific computing libraries including _NumPy_, _scikit-learn_, and _joblib_. 
+
+A core principle of the _RESOLUTE_ software design is object preservation and functional purity. Unlike many single-cell utilities that mutate the primary data structure by adding transient categorical labels or unstructured arrays, _RESOLUTE_ treats the input _AnnData_ object as read-only. The execution pipeline returns an isolated, structured dictionary containing detailed results DataFrames.
+This decoupled architecture protects user workflows from downstream state-mutation side effects and ensures compliance with reproducible data science practices.
+
+### Algorithmic Workflow and Mathematical Optimization
+The software architecture follows a modular, dual-layered optimization strategy across a continuous user-defined resolution vector $(\mathcal{R} = [res_{min}, res_{max}, \Delta res])$. The execution flow is divided into three distinct execution steps:
+
+- Graph Partitioning Sweep: For each resolution $\gamma \in \mathcal{R}$, data points are partitioned into communities using a Leiden algorithm built upon a pre-computed neighborhood graph stored within the _AnnData_ object.
+    
+- Geometric Scoring Engine: Following community detection, the software assess cluster properties by using two primary geometric cost functions:
+  - Bayesian Information Criterion (BIC): Evaluates the trade-off between the statistical model likelihood and the degree of freedom penalties associated with increasing cluster numbers ($k$).
+  - Calinski-Harabasz (CH) Score: Evaluates the ratio of between-cluster variance to within-cluster variance. Because the traditional CH score maximizes with cluster quality, _RESOLUTE_ minimizes an inverted function $(-1 \times CH)$ to maintain structural alignment with the BIC optimization engine.
+
+Importantly, the user can decouple the geometric evaluation space _use_rep_, e.g., _X_umap_ or _X_scVI_ from the initial topological space.
+    
+- Topological Bootstrap Module: Operating independently of the BIC and Calinski-Harabasz score, an optional bootstrap stability analysis can be performed (**compute_stability=True**). This module measures the structural robustness of the selected communities against local perturbations. For each resolution parameter, the software iteratively draws random subsets of cells, reconstructs the localized neighborhood graph on a designated latent representation _stability_use_rep_, typically _X_pca_, and runs community detection to assess topological stability across iterations.
+
+### Computational Performance
+To accommodate the high-throughput scale of huge spatial and single-cell datasets, _RESOLUTE_ incorporates a highly parallelized execution loop. Rather than sequentially executing the resolution sweep and iterative bootstrapping, which introduces severe processing bottlenecks, the software delegates compute threads across all available CPU cores using native multi-processing via _joblib_.
+
+By evaluating the geometric metrics directly on low-dimensional matrix representations (e.g., PCA or UMAP embeddings) rather than storing large matrices, _RESOLUTE_ operates with highly efficient memory and time complexity scaling. This allows the software to compute multi-scale parameters rapidly without inducing Out-Of-Memory (OOM) faults on typical bioinformatics machines, establishing it as a highly scalable solution for large cellular atlases.
 
 # Research impact statement
 
-`Gala` has demonstrated significant research impact and grown both its user base
-and contributor community since its initial release. The package has evolved
-through contributions from over 18 developers beyond the original core developer
-(@adrn), with community members adding new features, reporting bugs, and
-suggesting new features.
-
-While `Gala` started as a tool primarily to support the core developer's
-research, it has expanded organically to support a range of applications across
-domains in astrophysics related to Milky Way and galactic dynamics. The package
-has been used in over 400 publications (according to Google Scholar) spanning
-topics in galactic dynamics such as modeling stellar streams [@Pearson:2017],
-Milky Way mass modeling, and interpreting kinematic and stellar population
-trends in the Galaxy. `Gala` is integrated within the Astropy ecosystem as an
-affiliated package and has built functionality that extends the widely-used
-`astropy.units` and `astropy.coordinates` subpackages. `Gala`'s impact extends
-beyond citations in research: Because of its focus on usability and user
-interface design, `Gala` has also been incorporated into graduate-level galactic
-dynamics curricula at multiple institutions.
-
-`Gala` has been downloaded over 100,000 times from PyPI and conda-forge yearly
-(or ~2,000 downloads per week) over the past few years, demonstrating a broad
-and active user community. Users span career stages from graduate students to
-faculty and other established researchers and represent institutions around the
-world. This broad adoption and active participation validate `Gala`'s role as
-core community infrastructure for galactic dynamics research.
+Write something regarding the intensive use at ENS of Lyon?
 
 # Mathematics
 
@@ -157,13 +123,13 @@ Figure sizes can be customized by adding an optional second parameter:
 ![Caption for example figure.](figure.png){ width=20% }
 
 # AI usage disclosure
+During the preparation of this work, the authors utilized generative artificial intelligence technologies (specifically, Google's Gemini large language model) for two distinct purposes:
+-  Manuscript Preparation: The AI was used to assist in structuring, drafting, and refining the language of the manuscript, including the synthesis of comparative literature and software design descriptions.
+- AI-guided suggestions were utilized during the engineering of the _RESOLUTE_ Python package. Specifically, the AI assisted in drafting the iterative sampling scripts for the topological bootstrap stability module and optimizing the parallel execution framework (_joblib_) for the Bayesian Information Criterion (BIC) and Calinski-Harabasz  scoring metrics.
 
-No generative AI tools were used in the development of this software, the writing
-of this manuscript, or the preparation of supporting materials.
+The authora thoroughly reviewed, tested, and edited all generated text and underlying source code. The authors take full responsibility for the scientific accuracy, code integrity, and final content of this publication.
 
 # Acknowledgements
 
-We acknowledge contributions from Brigitta Sipocz, Syrtis Major, and Semyeong
-Oh, and support from Kathryn Johnston during the genesis of this project.
 
 # References
